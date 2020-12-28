@@ -6,8 +6,6 @@ mod render;
 
 use glfw::Context;
 
-use render::shader::Shader;
-
 use input_handler::InputHandler;
 
 fn main() {
@@ -29,6 +27,19 @@ fn main() {
     }
 
     let mut input = InputHandler::new();
+
+    use std::ffi::CString;
+
+    let vert_shader =
+        render::Shader::from_vert_source(&CString::new(include_str!("triangle.vert")).unwrap())
+            .unwrap();
+    let frag_shader =
+        render::Shader::from_vert_source(&CString::new(include_str!("triangle.frag")).unwrap())
+            .unwrap();
+
+    let shader_program = render::Program::from_shaders(&[vert_shader, frag_shader]).unwrap();
+
+    shader_program.set_used();
 
     while !window.should_close() {
         unsafe {

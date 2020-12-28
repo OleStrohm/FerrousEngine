@@ -1,1 +1,2 @@
-pub mod shader;
+mod shader;
+pub use shader::*;
