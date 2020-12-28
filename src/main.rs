@@ -1,57 +1,10 @@
 extern crate gl;
 extern crate glfw;
 
-use glfw::{Action, Context, Key};
-use std::collections::HashMap;
+use glfw::Context;
 
-#[derive(Debug)]
-struct InputHandler {
-    clicked_keys: HashMap<Key, bool>,
-    down_keys: HashMap<Key, bool>,
-    repeat_keys: HashMap<Key, bool>,
-}
-
-impl InputHandler {
-    pub fn new() -> InputHandler {
-        InputHandler {
-            clicked_keys: HashMap::new(),
-            down_keys: HashMap::new(),
-            repeat_keys: HashMap::new(),
-        }
-    }
-
-    pub fn update(&mut self, k: Key, a: &Action) {
-        match a {
-            Action::Press => {
-                self.clicked_keys.insert(k, true);
-                self.down_keys.insert(k, true);
-            }
-            Action::Repeat => {
-                self.repeat_keys.insert(k, true);
-            }
-            Action::Release => {
-                self.down_keys.insert(k, false);
-                self.repeat_keys.insert(k, false);
-            }
-        }
-    }
-
-    pub fn clear(&mut self) {
-        self.clicked_keys.clear();
-    }
-
-    pub fn clicked(&self, k: &Key) -> bool {
-        *self.clicked_keys.get(k).unwrap_or(&false)
-    }
-
-    pub fn down(&self, k: &Key) -> bool {
-        *self.down_keys.get(k).unwrap_or(&false)
-    }
-
-    pub fn repeat(&self, k: &Key) -> bool {
-        *self.repeat_keys.get(k).unwrap_or(&false)
-    }
-}
+mod input_handler;
+use input_handler::InputHandler;
 
 fn main() {
     let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
@@ -90,35 +43,5 @@ fn main() {
                 _ => {}
             }
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn input_basic() {
-        let mut input = InputHandler::new();
-
-        input.update(Key::Escape, &Action::Press);
-        assert!(input.clicked(&Key::Escape));
-        assert!(input.down(&Key::Escape));
-        assert!(!input.repeat(&Key::Escape));
-
-        input.clear();
-        assert!(!input.clicked(&Key::Escape));
-        assert!(input.down(&Key::Escape));
-        assert!(!input.repeat(&Key::Escape));
-
-        input.update(Key::Escape, &Action::Repeat);
-        assert!(!input.clicked(&Key::Escape));
-        assert!(input.down(&Key::Escape));
-        assert!(input.repeat(&Key::Escape));
-
-        input.update(Key::Escape, &Action::Release);
-        assert!(!input.clicked(&Key::Escape));
-        assert!(!input.down(&Key::Escape));
-        assert!(!input.repeat(&Key::Escape));
     }
 }
