@@ -5,7 +5,8 @@ use std::collections::HashMap;
 
 #[derive(Debug)]
 pub struct InputHandler {
-    clicked_keys: HashMap<Key, bool>,
+    pressed_keys: HashMap<Key, bool>,
+    released_keys: HashMap<Key, bool>,
     down_keys: HashMap<Key, bool>,
     repeat_keys: HashMap<Key, bool>,
 }
@@ -13,7 +14,8 @@ pub struct InputHandler {
 impl InputHandler {
     pub fn new() -> InputHandler {
         InputHandler {
-            clicked_keys: HashMap::new(),
+            pressed_keys: HashMap::new(),
+            released_keys: HashMap::new(),
             down_keys: HashMap::new(),
             repeat_keys: HashMap::new(),
         }
@@ -22,13 +24,14 @@ impl InputHandler {
     pub fn update(&mut self, k: Key, a: &Action) {
         match a {
             Action::Press => {
-                self.clicked_keys.insert(k, true);
+                self.pressed_keys.insert(k, true);
                 self.down_keys.insert(k, true);
             }
             Action::Repeat => {
                 self.repeat_keys.insert(k, true);
             }
             Action::Release => {
+                self.released_keys.insert(k, true);
                 self.down_keys.insert(k, false);
                 self.repeat_keys.insert(k, false);
             }
@@ -36,17 +39,26 @@ impl InputHandler {
     }
 
     pub fn clear(&mut self) {
-        self.clicked_keys.clear();
+        self.pressed_keys.clear();
+        self.released_keys.clear();
     }
 
-    pub fn clicked(&self, k: &Key) -> bool {
-        *self.clicked_keys.get(k).unwrap_or(&false)
+    #[allow(dead_code)]
+    pub fn pressed(&self, k: &Key) -> bool {
+        *self.pressed_keys.get(k).unwrap_or(&false)
     }
 
+    #[allow(dead_code)]
+    pub fn released(&self, k: &Key) -> bool {
+        *self.released_keys.get(k).unwrap_or(&false)
+    }
+
+    #[allow(dead_code)]
     pub fn down(&self, k: &Key) -> bool {
         *self.down_keys.get(k).unwrap_or(&false)
     }
 
+    #[allow(dead_code)]
     pub fn repeat(&self, k: &Key) -> bool {
         *self.repeat_keys.get(k).unwrap_or(&false)
     }
@@ -61,22 +73,33 @@ mod tests {
         let mut input = InputHandler::new();
 
         input.update(Key::Escape, &Action::Press);
-        assert!(input.clicked(&Key::Escape));
+        assert!(input.pressed(&Key::Escape));
+        assert!(!input.released(&Key::Escape));
         assert!(input.down(&Key::Escape));
         assert!(!input.repeat(&Key::Escape));
 
         input.clear();
-        assert!(!input.clicked(&Key::Escape));
+        assert!(!input.pressed(&Key::Escape));
+        assert!(!input.released(&Key::Escape));
         assert!(input.down(&Key::Escape));
         assert!(!input.repeat(&Key::Escape));
 
         input.update(Key::Escape, &Action::Repeat);
-        assert!(!input.clicked(&Key::Escape));
+        assert!(!input.pressed(&Key::Escape));
+        assert!(!input.released(&Key::Escape));
         assert!(input.down(&Key::Escape));
         assert!(input.repeat(&Key::Escape));
 
+        input.clear();
         input.update(Key::Escape, &Action::Release);
-        assert!(!input.clicked(&Key::Escape));
+        assert!(!input.pressed(&Key::Escape));
+        assert!(input.released(&Key::Escape));
+        assert!(!input.down(&Key::Escape));
+        assert!(!input.repeat(&Key::Escape));
+
+        input.clear();
+        assert!(!input.pressed(&Key::Escape));
+        assert!(!input.released(&Key::Escape));
         assert!(!input.down(&Key::Escape));
         assert!(!input.repeat(&Key::Escape));
     }
