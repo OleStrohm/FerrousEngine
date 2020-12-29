@@ -1,11 +1,9 @@
 extern crate gl;
 extern crate glfw;
 
-pub mod resources;
-pub mod render;
 pub mod input_handler;
-
-use glfw::Context;
+pub mod render;
+pub mod resources;
 
 use input_handler::InputHandler;
 use resources::Resources;
@@ -14,20 +12,9 @@ use std::path::Path;
 fn main() {
     println!("Welcome to a rusty engine!");
 
-    let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
+    let mut window = render::Window::new(600, 400);
 
-    glfw.window_hint(glfw::WindowHint::Resizable(false));
-    let (mut window, events) = glfw
-        .create_window(600, 400, "Window!", glfw::WindowMode::Windowed)
-        .expect("Failed to create GLFW window.");
-
-    window.set_resizable(true);
-    window.make_current();
-    window.set_key_polling(true);
-
-    gl::load_with(|s| window.get_proc_address(s));
     unsafe {
-        gl::Viewport(0, 0, 600, 400);
         gl::ClearColor(0.25, 0.05, 0.5, 1.0);
     }
 
@@ -38,9 +25,7 @@ fn main() {
     shader_program.set_used();
 
     let vertices: Vec<f32> = vec![
-        -0.5, -0.5, 0.0, 1.0, 0.0, 0.0,
-         0.5, -0.5, 0.0, 0.0, 1.0, 0.0,
-         0.0,  0.5, 0.0, 0.0, 0.0, 1.0,
+        -0.5, -0.5, 0.0, 1.0, 0.0, 0.0, 0.5, -0.5, 0.0, 0.0, 1.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 1.0,
     ];
 
     let mut vbo: gl::types::GLuint = 0;
@@ -102,8 +87,7 @@ fn main() {
 
         window.swap_buffers();
         input.clear();
-        glfw.poll_events();
-        for (_, event) in glfw::flush_messages(&events) {
+        for event in window.flush_messages() {
             match event {
                 glfw::WindowEvent::Key(k, _, a, _) => input.update(k, &a),
                 _ => println!("{:?}", event),
