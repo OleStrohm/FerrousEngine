@@ -1,12 +1,15 @@
 extern crate gl;
 extern crate glfw;
 
-mod input_handler;
-mod render;
+pub mod resources;
+pub mod render;
+pub mod input_handler;
 
 use glfw::Context;
 
 use input_handler::InputHandler;
+use resources::Resources;
+use std::path::Path;
 
 fn main() {
     println!("Welcome to a rusty engine!");
@@ -28,18 +31,9 @@ fn main() {
         gl::ClearColor(0.25, 0.05, 0.5, 1.0);
     }
 
-    let mut input = InputHandler::new();
+    let res = Resources::from_relative_exe_path(Path::new("assets")).unwrap();
 
-    use std::ffi::CString;
-
-    let vert_shader =
-        render::Shader::from_vert_source(&CString::new(include_str!("triangle.vert")).unwrap())
-            .unwrap();
-    let frag_shader =
-        render::Shader::from_frag_source(&CString::new(include_str!("triangle.frag")).unwrap())
-            .unwrap();
-
-    let shader_program = render::Program::from_shaders(&[vert_shader, frag_shader]).unwrap();
+    let shader_program = render::Program::from_res(&res, "shaders/triangle").unwrap();
 
     shader_program.set_used();
 
@@ -94,6 +88,7 @@ fn main() {
         gl::BindVertexArray(0);
     }
 
+    let mut input = InputHandler::new();
     while !window.should_close() {
         unsafe {
             gl::Clear(gl::COLOR_BUFFER_BIT);
