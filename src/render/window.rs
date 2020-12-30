@@ -22,7 +22,7 @@ impl Window {
 
         gl::load_with(|s| window.get_proc_address(s));
         unsafe {
-            gl::Viewport(0, 0, 600, 400);
+            gl::Viewport(0, 0, width as i32, height as i32);
         }
 
         Window { window, events, glfw }
