@@ -1,4 +1,7 @@
 extern crate gl;
+extern crate glfw;
+#[macro_use] extern crate render_derive;
+
 pub mod input_handler;
 pub mod render;
 pub mod resources;
