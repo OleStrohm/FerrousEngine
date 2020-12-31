@@ -90,7 +90,7 @@ impl Program {
         Ok(Program { id: program_id })
     }
 
-    pub fn set_used(&self) {
+    pub fn bind(&self) {
         unsafe {
             gl::UseProgram(self.id);
         }

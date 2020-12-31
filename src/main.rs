@@ -1,6 +1,7 @@
 extern crate gl;
 extern crate glfw;
-#[macro_use] extern crate render_derive;
+#[macro_use]
+extern crate render_derive;
 
 pub mod input_handler;
 pub mod render;
@@ -8,10 +9,10 @@ pub mod resources;
 pub mod utils;
 
 use input_handler::InputHandler;
+use render::buffer::{ArrayBuffer, VertexArray};
+use render::Vertex;
 use resources::Resources;
 use std::path::Path;
-use render::Vertex;
-use render::buffer::ArrayBuffer;
 
 fn main() {
     println!("Welcome to a rusty engine!");
@@ -29,24 +30,18 @@ fn main() {
     let vertices: Vec<Vertex> = vec![
         Vertex::new((-0.5, -0.5, 0.0).into(), (1.0, 0.0, 0.0).into()),
         Vertex::new((0.5, -0.5, 0.0).into(), (0.0, 1.0, 0.0).into()),
-        Vertex::new((0.0, 0.5, 0.0).into(), (0.0, 0.0, 1.0).into())
+        Vertex::new((0.0, 0.5, 0.0).into(), (0.0, 0.0, 1.0).into()),
     ];
 
     let vbo = ArrayBuffer::new();
     vbo.buffer_static_data(&vertices);
 
-    let mut vao: gl::types::GLuint = 0;
-    unsafe {
-        gl::GenVertexArrays(1, &mut vao);
-        gl::BindVertexArray(vao);
-
-        vbo.bind();
-
-        Vertex::vertex_attrib_pointers();
-
-        vbo.unbind();
-        gl::BindVertexArray(0);
-    }
+    let vao = VertexArray::new();
+    vao.bind();
+    vbo.bind();
+    Vertex::vertex_attrib_pointers();
+    vbo.unbind();
+    vao.unbind();
 
     let mut input = InputHandler::new();
     while !window.should_close() {
@@ -54,9 +49,9 @@ fn main() {
             gl::Clear(gl::COLOR_BUFFER_BIT);
         }
 
-        shader_program.set_used();
+        shader_program.bind();
         unsafe {
-            gl::BindVertexArray(vao);
+            vao.bind();
             gl::DrawArrays(gl::TRIANGLES, 0, 3);
         }
 
