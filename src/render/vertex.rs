@@ -1,7 +1,7 @@
 use crate::utils::Vec3;
 
 #[derive(Debug, Copy, Clone, VertexAttribPointers)]
-#[repr(C, packed)]
+#[repr(C)]
 pub struct Vertex {
     #[location = 0]
     pub pos: Vec3,

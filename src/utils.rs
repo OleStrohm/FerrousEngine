@@ -1,14 +1,14 @@
 use std::ops::{Add, Mul};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-#[repr(C, packed)]
+#[repr(C)]
 pub struct Vec2 {
     x: f32,
     y: f32,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-#[repr(C, packed)]
+#[repr(C)]
 pub struct Vec3 {
     x: f32,
     y: f32,
@@ -16,7 +16,7 @@ pub struct Vec3 {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-#[repr(C, packed)]
+#[repr(C)]
 pub struct Vec4 {
     x: f32,
     y: f32,

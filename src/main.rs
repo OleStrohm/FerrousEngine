@@ -11,6 +11,7 @@ use input_handler::InputHandler;
 use resources::Resources;
 use std::path::Path;
 use render::Vertex;
+use render::buffer::ArrayBuffer;
 
 fn main() {
     println!("Welcome to a rusty engine!");
@@ -31,30 +32,19 @@ fn main() {
         Vertex::new((0.0, 0.5, 0.0).into(), (0.0, 0.0, 1.0).into())
     ];
 
-    let mut vbo: gl::types::GLuint = 0;
-    unsafe {
-        gl::GenBuffers(1, &mut vbo);
-
-        gl::BindBuffer(gl::ARRAY_BUFFER, vbo);
-        gl::BufferData(
-            gl::ARRAY_BUFFER,
-            (vertices.len() * std::mem::size_of::<Vertex>()) as gl::types::GLsizeiptr,
-            vertices.as_ptr() as *const gl::types::GLvoid,
-            gl::STATIC_DRAW,
-        );
-        gl::BindBuffer(gl::ARRAY_BUFFER, 0);
-    }
+    let vbo = ArrayBuffer::new();
+    vbo.buffer_static_data(&vertices);
 
     let mut vao: gl::types::GLuint = 0;
     unsafe {
         gl::GenVertexArrays(1, &mut vao);
         gl::BindVertexArray(vao);
 
-        gl::BindBuffer(gl::ARRAY_BUFFER, vbo);
+        vbo.bind();
 
         Vertex::vertex_attrib_pointers();
 
-        gl::BindBuffer(gl::ARRAY_BUFFER, 0);
+        vbo.unbind();
         gl::BindVertexArray(0);
     }
 
