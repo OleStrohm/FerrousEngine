@@ -19,13 +19,19 @@ impl Window {
         window.set_resizable(true);
         window.make_current();
         window.set_key_polling(true);
+        window.set_mouse_button_polling(true);
+        window.set_size_polling(true);
 
         gl::load_with(|s| window.get_proc_address(s));
         unsafe {
             gl::Viewport(0, 0, width as i32, height as i32);
         }
 
-        Window { window, events, glfw }
+        Window {
+            window,
+            events,
+            glfw,
+        }
     }
 
     pub fn flush_messages<'a>(&'a mut self) -> impl Iterator<Item = glfw::WindowEvent> + 'a {
@@ -39,5 +45,17 @@ impl Window {
 
     pub fn swap_buffers(&mut self) {
         self.window.swap_buffers();
+    }
+
+    pub fn clear(&self) {
+        unsafe {
+            gl::Clear(gl::COLOR_BUFFER_BIT);
+        }
+    }
+
+    pub fn set_clear_color(&self, r: f32, g: f32, b: f32, a: f32) {
+        unsafe {
+            gl::ClearColor(r, g, b, a);
+        }
     }
 }

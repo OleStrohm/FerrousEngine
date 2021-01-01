@@ -3,6 +3,9 @@ use gl::types::*;
 pub type ArrayBuffer = Buffer<BufferTypeArray>;
 pub type ElementArrayBuffer = Buffer<BufferTypeElementArray>;
 
+pub type VertexBufferObject = ArrayBuffer;
+pub type IndexBufferObject = ElementArrayBuffer;
+
 pub trait BufferType {
     const BUFFER_TYPE: GLuint;
 }
@@ -11,7 +14,7 @@ pub struct Buffer<B>
 where
     B: BufferType,
 {
-    vbo: GLuint,
+    buffer_obj: GLuint,
     _buffer_marker: ::std::marker::PhantomData<B>,
 }
 
@@ -34,19 +37,18 @@ where
     B: BufferType,
 {
     pub fn new() -> Buffer<B> {
-        let mut vbo: GLuint = 0;
+        let mut buffer_obj: GLuint = 0;
         unsafe {
-            gl::GenBuffers(1, &mut vbo);
+            gl::GenBuffers(1, &mut buffer_obj);
         }
 
         Buffer {
-            vbo,
+            buffer_obj,
             _buffer_marker: ::std::marker::PhantomData,
         }
     }
 
     pub fn buffer_static_data<T>(&self, data: &[T]) {
-        self.bind();
         unsafe {
             gl::BufferData(
                 B::BUFFER_TYPE,
@@ -55,12 +57,11 @@ where
                 gl::STATIC_DRAW,
             );
         }
-        self.unbind();
     }
 
     pub fn bind(&self) {
         unsafe {
-            gl::BindBuffer(B::BUFFER_TYPE, self.vbo);
+            gl::BindBuffer(B::BUFFER_TYPE, self.buffer_obj);
         }
     }
 
@@ -77,7 +78,7 @@ where
 {
     fn drop(&mut self) {
         unsafe {
-            gl::DeleteBuffers(1, &mut self.vbo);
+            gl::DeleteBuffers(1, &mut self.buffer_obj);
         }
     }
 }
