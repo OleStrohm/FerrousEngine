@@ -9,7 +9,7 @@ pub mod resources;
 pub mod utils;
 
 use input_handler::InputHandler;
-use render::buffer::{ArrayBuffer, VertexArray};
+use render::{ArrayBuffer, VertexArray};
 use render::Vertex;
 use resources::Resources;
 use std::path::Path;
