@@ -2,7 +2,7 @@ use glfw::Context;
 use std::sync::mpsc::Receiver;
 
 pub struct Window {
-    window: glfw::Window,
+    inner: glfw::Window,
     events: Receiver<(f64, glfw::WindowEvent)>,
     glfw: glfw::Glfw,
 }
@@ -12,23 +12,23 @@ impl Window {
         let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
 
         glfw.window_hint(glfw::WindowHint::Resizable(false));
-        let (mut window, events) = glfw
+        let (mut inner, events) = glfw
             .create_window(width, height, "Window!", glfw::WindowMode::Windowed)
             .expect("Failed to create GLFW window.");
 
-        window.set_resizable(true);
-        window.make_current();
-        window.set_key_polling(true);
-        window.set_mouse_button_polling(true);
-        window.set_size_polling(true);
+        inner.set_resizable(true);
+        inner.make_current();
+        inner.set_key_polling(true);
+        inner.set_mouse_button_polling(true);
+        inner.set_size_polling(true);
 
-        gl::load_with(|s| window.get_proc_address(s));
+        gl::load_with(|s| inner.get_proc_address(s));
         unsafe {
             gl::Viewport(0, 0, width as i32, height as i32);
         }
 
         Window {
-            window,
+            inner,
             events,
             glfw,
         }
@@ -40,11 +40,11 @@ impl Window {
     }
 
     pub fn should_close(&self) -> bool {
-        self.window.should_close()
+        self.inner.should_close()
     }
 
     pub fn swap_buffers(&mut self) {
-        self.window.swap_buffers();
+        self.inner.swap_buffers();
     }
 
     pub fn clear(&self) {
